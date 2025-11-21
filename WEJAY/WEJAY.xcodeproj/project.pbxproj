@@ -13,6 +13,7 @@
 		04B498742ECF85A400256821 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04B498732ECF85A400256821 /* GoogleSignInSwift */; };
 		04B498772ECF85CC00256821 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 04B498762ECF85CC00256821 /* SDWebImageSwiftUI */; };
 		04B4987A2ECF87C000256821 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 04B498792ECF87C000256821 /* FirebaseAuth */; };
+		04B4989A2ECFB74500256821 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 04B498992ECFB74500256821 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 				04B4986C2ECF854E00256821 /* FirebaseAnalytics in Frameworks */,
 				04B498722ECF85A400256821 /* GoogleSignIn in Frameworks */,
 				04B498742ECF85A400256821 /* GoogleSignInSwift in Frameworks */,
+				04B4989A2ECFB74500256821 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +156,7 @@
 				04B498732ECF85A400256821 /* GoogleSignInSwift */,
 				04B498762ECF85CC00256821 /* SDWebImageSwiftUI */,
 				04B498792ECF87C000256821 /* FirebaseAuth */,
+				04B498992ECFB74500256821 /* FirebaseFirestore */,
 			);
 			productName = WEJAY;
 			productReference = 04B498392ECF815800256821 /* WEJAY.app */;
@@ -666,6 +669,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 04B4986A2ECF854E00256821 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		04B498992ECFB74500256821 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B4986A2ECF854E00256821 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

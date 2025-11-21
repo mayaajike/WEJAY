@@ -7,22 +7,6 @@
 
 import SwiftUI
 
-@MainActor
-final class LogInViewModel: ObservableObject {
-    
-    @Published var email = ""
-    @Published var password = ""
-    
-    func LogIn() async throws {
-        guard !email.isEmpty, !password.isEmpty else {
-            print("No email or password found.")
-            return
-        }
-        
-        try await AuthenticationManager.shared.signInUser(email: email, password: password)
-    }
-}
-
 struct LogInEmailView: View {
     
     @StateObject private var viewModel = LogInViewModel()
@@ -73,6 +57,13 @@ struct LogInEmailView: View {
                             .frame(width: 300, height: 50)
                             .background(Color.purple)
                             .cornerRadius(10)
+                    }
+                    
+                    NavigationLink(destination: SignUpEmailView(showSignUpView: $showSignUpView)) {
+                        Text("Don't have an account yet? Sign Up")
+                            .font(.body)
+                            .foregroundColor(.purple)
+                            .underline(color: .purple)
                     }
                 }
             }
