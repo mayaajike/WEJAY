@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		044249A12ED5A08C0076A75E /* SwiftfulUI in Frameworks */ = {isa = PBXBuildFile; productRef = 044249A02ED5A08C0076A75E /* SwiftfulUI */; };
+		044249A42ED5A0B50076A75E /* SwiftfulRouting in Frameworks */ = {isa = PBXBuildFile; productRef = 044249A32ED5A0B50076A75E /* SwiftfulRouting */; };
 		04B4986C2ECF854E00256821 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 04B4986B2ECF854E00256821 /* FirebaseAnalytics */; };
 		04B4986F2ECF857B00256821 /* SwiftUIFontIcon in Frameworks */ = {isa = PBXBuildFile; productRef = 04B4986E2ECF857B00256821 /* SwiftUIFontIcon */; };
 		04B498722ECF85A400256821 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 04B498712ECF85A400256821 /* GoogleSignIn */; };
@@ -79,6 +81,8 @@
 				04B4987A2ECF87C000256821 /* FirebaseAuth in Frameworks */,
 				04B4986F2ECF857B00256821 /* SwiftUIFontIcon in Frameworks */,
 				04B4986C2ECF854E00256821 /* FirebaseAnalytics in Frameworks */,
+				044249A42ED5A0B50076A75E /* SwiftfulRouting in Frameworks */,
+				044249A12ED5A08C0076A75E /* SwiftfulUI in Frameworks */,
 				04B498722ECF85A400256821 /* GoogleSignIn in Frameworks */,
 				04B498742ECF85A400256821 /* GoogleSignInSwift in Frameworks */,
 				04B4989A2ECFB74500256821 /* FirebaseFirestore in Frameworks */,
@@ -157,6 +161,8 @@
 				04B498762ECF85CC00256821 /* SDWebImageSwiftUI */,
 				04B498792ECF87C000256821 /* FirebaseAuth */,
 				04B498992ECFB74500256821 /* FirebaseFirestore */,
+				044249A02ED5A08C0076A75E /* SwiftfulUI */,
+				044249A32ED5A0B50076A75E /* SwiftfulRouting */,
 			);
 			productName = WEJAY;
 			productReference = 04B498392ECF815800256821 /* WEJAY.app */;
@@ -245,6 +251,8 @@
 				04B4986D2ECF857B00256821 /* XCRemoteSwiftPackageReference "SwiftUIFontIcon" */,
 				04B498702ECF85A400256821 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 				04B498752ECF85CC00256821 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				0442499F2ED5A08C0076A75E /* XCRemoteSwiftPackageReference "SwiftfulUI" */,
+				044249A22ED5A0B50076A75E /* XCRemoteSwiftPackageReference "SwiftfulRouting" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B4983A2ECF815800256821 /* Products */;
@@ -605,6 +613,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0442499F2ED5A08C0076A75E /* XCRemoteSwiftPackageReference "SwiftfulUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftfulThinking/SwiftfulUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+		044249A22ED5A0B50076A75E /* XCRemoteSwiftPackageReference "SwiftfulRouting" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftfulThinking/SwiftfulRouting.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.8;
+			};
+		};
 		04B4986A2ECF854E00256821 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -640,6 +664,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		044249A02ED5A08C0076A75E /* SwiftfulUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0442499F2ED5A08C0076A75E /* XCRemoteSwiftPackageReference "SwiftfulUI" */;
+			productName = SwiftfulUI;
+		};
+		044249A32ED5A0B50076A75E /* SwiftfulRouting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 044249A22ED5A0B50076A75E /* XCRemoteSwiftPackageReference "SwiftfulRouting" */;
+			productName = SwiftfulRouting;
+		};
 		04B4986B2ECF854E00256821 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 04B4986A2ECF854E00256821 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

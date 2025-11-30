@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import SwiftfulRouting
 
 @main
 struct WEJAYApp: App {
@@ -15,7 +16,9 @@ struct WEJAYApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RouterView { _ in
+                RootView()
+            }
         }
     }
 }
@@ -25,5 +28,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         FirebaseApp.configure()
         return true
+    }
+}
+
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        interactivePopGestureRecognizer?.delegate = self
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
     }
 }

@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import SwiftfulRouting
 
 struct SettingsView: View {
     
     @StateObject private var viewModel = SettingsViewModel()
     @Binding var showSignUpView: Bool
+    @Environment(\.router) var router
+    
     @State private var showResetAlert = false
     @State private var showUpdateEmailAlert = false
     @State private var showPasswordField = false
@@ -27,7 +30,12 @@ struct SettingsView: View {
                 Task {
                     do {
                         try viewModel.signOut()
-                        showSignUpView = true
+                        
+                        await MainActor.run {
+                            showSignUpView = true
+                             router.dismissAllScreens()
+                        }
+                        
                     } catch {
                         print(error)
                     }
