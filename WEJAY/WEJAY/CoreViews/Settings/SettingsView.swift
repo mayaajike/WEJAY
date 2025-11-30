@@ -6,55 +6,14 @@
 //
 
 import SwiftUI
-
-@MainActor
-final class SettingsViewModel: ObservableObject {
-    
-    @Published var authProviders: [AuthProviderOption] = []
-    
-    enum AuthError: LocalizedError {
-        case missingEmail
-        
-        var errorDescription: String? {
-            switch self {
-            case .missingEmail:
-                return "No email associated with this session. Sign in again"
-            }
-        }
-    }
-    
-    func loadAuthProviders() {
-        if let providers = try? AuthenticationManager.shared.getProviders() {
-            authProviders = providers
-        }
-    }
-    
-    func signOut() throws {
-        try AuthenticationManager.shared.signOut()
-    }
-    
-    func resetPassword() async throws {
-        let authUser = try AuthenticationManager.shared.getAuthenticatedUser()
-        
-        guard let email = authUser.email else {
-            throw AuthError.missingEmail
-        }
-        try await AuthenticationManager.shared.resetPassword(email: email)
-    }
-    
-    func updatePassword(newPassword: String) async throws {
-        try await AuthenticationManager.shared.updatePassword(password: newPassword)
-    }
-    
-    func updateEmail() async throws {
-        try await AuthenticationManager.shared.updateEmail()
-    }
-}
+import SwiftfulRouting
 
 struct SettingsView: View {
     
     @StateObject private var viewModel = SettingsViewModel()
     @Binding var showSignUpView: Bool
+    @Environment(\.router) var router
+    
     @State private var showResetAlert = false
     @State private var showUpdateEmailAlert = false
     @State private var showPasswordField = false
@@ -62,6 +21,7 @@ struct SettingsView: View {
     @State private var showPasswordUpdateAlert = false
     @State private var showReAuthAlert = false
     @State private var showLogInView = false
+    @State private var showDeleteAlert = false
     
     var body: some View {
         List {
@@ -70,12 +30,43 @@ struct SettingsView: View {
                 Task {
                     do {
                         try viewModel.signOut()
-                        showSignUpView = true
+                        
+                        await MainActor.run {
+                            showSignUpView = true
+                             router.dismissAllScreens()
+                        }
+                        
                     } catch {
                         print(error)
                     }
                 }
             }
+            
+            // Delete account button
+            Button(role: .destructive) {
+                // Just show the alert first
+                showDeleteAlert = true
+            } label: {
+                Text("Delete Account")
+            }
+            .alert("Delete Account",
+                   isPresented: $showDeleteAlert) {
+                Button("Delete", role: .destructive) {
+                    Task {
+                        do {
+                            try await viewModel.deleteAccount()
+                            showSignUpView = true
+                        } catch {
+                            print(error)
+                        }
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Are you sure you want to delete your account? This action is permanent and cannot be undone.")
+            }
+            
+            
             if viewModel.authProviders.contains(.email) {
                 // update email & update & reset password buttons
                 emailSection

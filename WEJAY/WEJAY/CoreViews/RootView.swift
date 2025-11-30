@@ -14,7 +14,7 @@ struct RootView: View {
         ZStack {
             if !showSignUpView {
                 NavigationStack {
-                    SettingsView(showSignUpView: $showSignUpView)
+                    ProfileView(showSignUpView: $showSignUpView)
                 }
             }
         }
