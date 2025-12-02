@@ -145,6 +145,17 @@ private struct SpotifyTokenResponse: Decodable {
     let refresh_token: String?
 }
 
+struct SpotifyTokenRefreshResponse: Decodable {
+    let access_token: String
+    let token_type: String
+    let expires_in: TimeInterval
+    let scope: String?
+    let refresh_token: String?
+    
+    var accessToken: String { access_token }
+    var expiresIn: TimeInterval { expires_in }
+}
+
 extension SpotifyAPIService {
     func fetchSpotifyCurrentUser(accessToken: String) async throws -> SpotifyUserProfile {
         var components = URLComponents()
