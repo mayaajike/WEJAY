@@ -14,7 +14,7 @@ struct PartyPlaylistView: View {
     @Environment(\.router) var router
     
     var product: Product = .mock
-    var user: Userr = .mock
+    var user: DBUser
     
     @State private var products: [Product] = []
     @State private var showHeader: Bool = false
@@ -38,7 +38,7 @@ struct PartyPlaylistView: View {
                     
                     PlaylistDescriptionCell(
                         descriptionText: product.description,
-                        userName: user.firstName,
+                        userName: user.username?.first ?? "Guest",
                         subHeadline: product.category,
                         onAddToPlaylistPressed: nil,
                         onDownloadPressed: nil,
@@ -115,5 +115,17 @@ struct PartyPlaylistView: View {
 }
 
 #Preview {
-    PartyPlaylistView()
+    let mockUser = DBUser(
+            userId: "preview-user-id",
+            email: "maya@example.com",
+            username: UserName(first: "Maya", last: "Ody-Ajike"),
+            photoUrl: nil,
+            dateCreated: Date(),
+            isPremium: false,
+            genres: ["Afrobeats", "Hip-Hop"],
+            role: .dj,
+            spotify: nil
+        )
+    
+    PartyPlaylistView(user: mockUser)
 }

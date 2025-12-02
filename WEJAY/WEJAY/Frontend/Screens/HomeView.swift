@@ -13,11 +13,7 @@ struct HomeView: View {
     
     @Binding var showSignUpView: Bool
     @Environment(\.router) var router
-    
-    @State private var currentUser: Userr? = nil
-    @State private var selectedCategory: NavBarCategory? = nil
-    @State private var products: [Product] = []
-    @State private var productRows: [ProductRow] = []
+    @StateObject private var viewModel = HomeViewModel()
     
     var body: some View {
         ZStack {
@@ -33,7 +29,7 @@ struct HomeView: View {
                                 guideBarSection
                                     .padding(.horizontal, 16)
                                 
-                                if let product = products.first {
+                                if let product = viewModel.products.first {
                                     recentPartySection(product: product)
                                         .padding(.horizontal, 16)
                                 }
@@ -51,35 +47,31 @@ struct HomeView: View {
             
         }
         .task {
-            await getData()
+            await viewModel.loadInitialData()
         }
         .toolbar(.hidden, for: .navigationBar)
     }
-    
-    private func getData() async {
-        do {
-            currentUser = try await DBHelper().getUsers().first
-            products = try await Array(DBHelper().getProducts().prefix(8))
-            
-            var rows: [ProductRow] = []
-            let allBrands = Set(products.map({ $0.brand }))
-            for brand in allBrands {
-                rows.append(ProductRow(title: brand!.capitalized, products: products))
-            }
-            productRows = rows
-        } catch {
-            
-        }
-    }
-    
+        
     private var header: some View {
         HStack(spacing: 16) {
             // profile image
             ZStack {
-                if let currentUser {
-                    ImageLoaderView(urlString: currentUser.image)
+                if let user = viewModel.dbUser,
+                   let url = user.photoUrl {
+                    ImageLoaderView(urlString: url.absoluteString)
                         .background(.appWhite)
                         .clipShape(Circle())
+                        .onTapGesture {
+                            router.showScreen(.push) { _ in
+                                ProfileView(showSignUpView: $showSignUpView)
+                            }
+                        }
+                } else {
+                    // fallback avatar if no photoUrl
+                    Image(systemName: "person.circl.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.appWhite)
                         .onTapGesture {
                             router.showScreen(.push) { _ in
                                 ProfileView(showSignUpView: $showSignUpView)
@@ -89,16 +81,17 @@ struct HomeView: View {
             }
             .frame(width: 35, height: 35)
             
+            
             // categories
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(NavBarCategory.allCases, id: \.self) { category in
                         NavScrollBarCell(
                             message: category.rawValue.capitalized,
-                            isSelected: category == selectedCategory
+                            isSelected: category == viewModel.selectedCategory
                         )
                         .onTapGesture {
-                            selectedCategory = category
+                            viewModel.selectCategory(category)
                         }
                     }
                 }
@@ -128,22 +121,36 @@ struct HomeView: View {
         .background(Color.appBlack)
     }
     
+    
+
     private var guideBarSection: some View {
-        NonLazyVGrid(columns: 2, alignment: .center, spacing: 10, items: products) { product in
-            if let product {
-                GuideBarCell (imageName: product.firstImage, title: product.title)
-                    .asButton(.press) {
-                        
+        VStack(spacing: 12) {
+            // Top row Apple Music + Spotify
+            HStack(spacing: 12) {
+                GuideBarCell(option: .spotify, titleOverride: viewModel.spotifyDisplayName) {
+                    Task {
+                        await viewModel.connectSpotify()
                     }
+                }
+                
+                GuideBarCell(option: .appleMusic, titleOverride: nil) {
+                    // TODO: Apple music auth flow in viewModel
+                }
+            }
+            
+            // Bottom row share button
+            GuideBarCell(option: .share, titleOverride: nil) {
+                // TODO: share party flow
             }
         }
     }
     
+    
     private func goToPlaylistView(product: Product) {
-        guard let currentUser else { return }
+        guard let user = viewModel.dbUser else { return }
         
         router.showScreen(.push) { _ in
-                PartyPlaylistView(product: product, user: currentUser)
+                PartyPlaylistView(product: product, user: user)
         }
     }
     
@@ -164,7 +171,7 @@ struct HomeView: View {
     }
     
     private var prevPartyRows: some View {
-        ForEach(productRows) { row in
+        ForEach(viewModel.productRows) { row in
             VStack(spacing: 8) {
                 Text(row.title)
                     .font(.title)
