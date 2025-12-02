@@ -18,6 +18,17 @@ enum UserRole: String, Codable {
     case dj
 }
 
+struct SpotifyInfo: Codable {
+    let id: String
+    let displayName: String?
+    let email: String?
+    let profilePhotoUrl: String?
+    let accessToken: String
+    let refreshToken: String?
+    let scope: String
+    let expiresAt: Date
+}
+
 struct DBUser: Codable {
     let userId: String
     let email: String?
@@ -27,6 +38,7 @@ struct DBUser: Codable {
     let isPremium: Bool?
     let genres: [String]?
     let role: UserRole?
+    let spotify: SpotifyInfo?
     
     init(auth: AuthDataResultModel) {
         self.userId = auth.uid
@@ -37,6 +49,7 @@ struct DBUser: Codable {
         self.isPremium = false
         self.genres = nil
         self.role = nil
+        self.spotify = nil
     }
     
     init(
@@ -47,7 +60,8 @@ struct DBUser: Codable {
         dateCreated: Date? = nil,
         isPremium: Bool? = nil,
         genres: [String]? = nil,
-        role: UserRole? = nil
+        role: UserRole? = nil,
+        spotify: SpotifyInfo? = nil
     ) {
         self.userId = userId
         self.email = email
@@ -57,6 +71,7 @@ struct DBUser: Codable {
         self.isPremium = isPremium
         self.genres = genres
         self.role = role
+        self.spotify = spotify
     }
 }
 
@@ -159,5 +174,15 @@ final class UserManager {
         ]
         
         try await userDocument(userId: userId).updateData(data)
+    }
+    
+    func updateSpotifyInfo(userId: String, spotify: SpotifyInfo) async throws {
+        let data = try encoder.encode(spotify)
+        
+        let dict: [String: Any] = [
+            "spotify": data
+        ]
+        
+        try await userDocument(userId: userId).updateData(dict)
     }
 }
