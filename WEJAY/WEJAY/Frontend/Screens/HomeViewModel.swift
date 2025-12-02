@@ -16,16 +16,30 @@ final class HomeViewModel: ObservableObject {
     @Published var products: [Product] = []
     @Published var productRows: [ProductRow] = []
     @Published var spotifyUser: SpotifyUserProfile? = nil
+    @Published var spotifyInfo: SpotifyInfo? = nil
+    @Published var appleMusicInfo: AppleMusicInfo? = nil
     
-    var spotifyDisplayName: String? {
-        // Prefer display_name, fall back to id if needed
-        guard let user = spotifyUser else { return nil }
+    var isSpotifyConnected: Bool {
+        spotifyInfo?.isConnected == true
+    }
+    
+    var spotifyButtonDisplayTitleOverride: String? {
+        guard let info = spotifyInfo, info.isConnected else {
+            return nil
+        }
+        return info.displayName?.isEmpty == false ? info.displayName : "Connected"
+    }
+    
+    var appleMusicButtonDisplayTitleOverride: String? {
+        guard let info = appleMusicInfo, info.isConnected else {
+            // Not connected -> default tag on button
+            return nil
+        }
         
-        if let name = user.display_name, !name.isEmpty {
-            // use first name if there are spaces
-            return name.split(separator: " ").first.map(String.init) ?? name
+        if let firstName = dbUser?.username?.first, !firstName.isEmpty {
+            return firstName
         } else {
-            return "User \(user.id)"
+            return "Connected"
         }
     }
     
@@ -35,6 +49,11 @@ final class HomeViewModel: ObservableObject {
             
             let dbUser = try await UserManager.shared.getUser(userId: authUser.uid)
             self.dbUser = dbUser
+            self.spotifyInfo = dbUser.spotify
+            self.appleMusicInfo = dbUser.appleMusic
+            
+            // refresh access tokens i needed
+            await refreshSpotifyIfNeeded()
             
             products = try await Array(DBHelper().getProducts().prefix(8))
             
@@ -78,7 +97,8 @@ final class HomeViewModel: ObservableObject {
                 accessToken: spotifyAuthResult.accessToken,
                 refreshToken: spotifyAuthResult.refreshToken,
                 scope: spotifyAuthResult.scope,
-                expiresAt: expiresAt
+                expiresAt: expiresAt,
+                isConnected: true
             )
             
             // get current Firebase auth user
@@ -87,10 +107,80 @@ final class HomeViewModel: ObservableObject {
             // save to FireStore
             try await UserManager.shared.updateSpotifyInfo(userId: authUser.uid, spotify: spotifyInfo)
             
+            // update state variable
+            self.spotifyInfo = spotifyInfo
+            
             
             print("Spotify connected")
         } catch {
             print("Spotify sign-in failed, \(error)")
         }
     }
+    
+    func refreshSpotifyIfNeeded() async {
+        guard let currentSpotify = spotifyInfo,
+              currentSpotify.isConnected else {
+            return
+        }
+        
+        let now = Date()
+        
+        // if token is still valid break
+        if currentSpotify.expiresAt > now {
+            return
+        }
+        
+        // grab refresh token to refresh access token
+        guard let refreshToken = currentSpotify.refreshToken,
+              !refreshToken.isEmpty else {
+            print("Spotify access token expired and no refresh token available.")
+            return
+        }
+        
+        do {
+            // ask APIService to refresh the token
+            let tokenResponse = try await SpotifyAPIService.shared.refreshAccessToken(refreshToken: refreshToken)
+            
+            let newExpiresAt = Date().addingTimeInterval(tokenResponse.expiresIn)
+
+            let updatedSpotifyInfo = SpotifyInfo(
+                id: currentSpotify.id,
+                displayName: currentSpotify.displayName,
+                email: currentSpotify.email,
+                profilePhotoUrl: currentSpotify.profilePhotoUrl,
+                accessToken: tokenResponse.accessToken,
+                refreshToken: tokenResponse.refreshToken ?? currentSpotify.refreshToken,
+                scope: tokenResponse.scope,
+                expiresAt: newExpiresAt,
+                isConnected: true
+            )
+            
+            // save to db
+            let authUser = try AuthenticationManager.shared.getAuthenticatedUser()
+            try await UserManager.shared.updateSpotifyInfo(userId: authUser.uid, spotify: updatedSpotifyInfo)
+            
+            self.spotifyInfo = updatedSpotifyInfo
+            
+            print("Spotify token refreshed")
+        } catch {
+            print("Failed to refresh spotify token: \(error)")
+        }
+    }
+    
+    // Apple music connection flow
+    func connectAppleMusic() async {
+        do {
+            let appleMusicHelper = AppleMusicHelper()
+            let info = try await appleMusicHelper.appleMusicConnect()
+            
+            let authUser = try AuthenticationManager.shared.getAuthenticatedUser()
+            try await UserManager.shared.updateAppleMusicInfo(userId: authUser.uid, appleMusic: info)
+            
+            self.appleMusicInfo = info
+            print("Apple Music connected: ", info)
+        } catch {
+            print("Apple Music connection failed: ", error)
+        }
+    }
+    
 }

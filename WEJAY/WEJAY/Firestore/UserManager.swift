@@ -27,6 +27,12 @@ struct SpotifyInfo: Codable {
     let refreshToken: String?
     let scope: String
     let expiresAt: Date
+    let isConnected: Bool
+}
+
+struct AppleMusicInfo: Codable {
+    let isConnected: Bool
+    let lastUpdated: Date
 }
 
 struct DBUser: Codable {
@@ -39,6 +45,7 @@ struct DBUser: Codable {
     let genres: [String]?
     let role: UserRole?
     let spotify: SpotifyInfo?
+    let appleMusic: AppleMusicInfo?
     
     init(auth: AuthDataResultModel) {
         self.userId = auth.uid
@@ -50,6 +57,7 @@ struct DBUser: Codable {
         self.genres = nil
         self.role = nil
         self.spotify = nil
+        self.appleMusic = nil
     }
     
     init(
@@ -61,7 +69,8 @@ struct DBUser: Codable {
         isPremium: Bool? = nil,
         genres: [String]? = nil,
         role: UserRole? = nil,
-        spotify: SpotifyInfo? = nil
+        spotify: SpotifyInfo? = nil,
+        appleMusic: AppleMusicInfo? = nil
     ) {
         self.userId = userId
         self.email = email
@@ -72,6 +81,7 @@ struct DBUser: Codable {
         self.genres = genres
         self.role = role
         self.spotify = spotify
+        self.appleMusic = appleMusic
     }
 }
 
@@ -181,6 +191,16 @@ final class UserManager {
         
         let dict: [String: Any] = [
             "spotify": data
+        ]
+        
+        try await userDocument(userId: userId).updateData(dict)
+    }
+    
+    func updateAppleMusicInfo(userId: String, appleMusic: AppleMusicInfo) async throws {
+        let data = try encoder.encode(appleMusic)
+        
+        let dict: [String: Any] = [
+            "apple_music": data
         ]
         
         try await userDocument(userId: userId).updateData(dict)

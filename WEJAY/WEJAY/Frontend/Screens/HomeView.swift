@@ -68,7 +68,7 @@ struct HomeView: View {
                         }
                 } else {
                     // fallback avatar if no photoUrl
-                    Image(systemName: "person.circl.fill")
+                    Image(systemName: "person.circle.fill")
                         .resizable()
                         .scaledToFit()
                         .foregroundStyle(.appWhite)
@@ -127,14 +127,19 @@ struct HomeView: View {
         VStack(spacing: 12) {
             // Top row Apple Music + Spotify
             HStack(spacing: 12) {
-                GuideBarCell(option: .spotify, titleOverride: viewModel.spotifyDisplayName) {
+                GuideBarCell(option: .spotify, titleOverride: viewModel.spotifyButtonDisplayTitleOverride) {
                     Task {
+                        
+                        guard !viewModel.isSpotifyConnected else { return }
                         await viewModel.connectSpotify()
                     }
                 }
                 
-                GuideBarCell(option: .appleMusic, titleOverride: nil) {
-                    // TODO: Apple music auth flow in viewModel
+                GuideBarCell(option: .appleMusic, titleOverride: viewModel.appleMusicButtonDisplayTitleOverride) {
+                    // TODO: Join developer program and test auth flow
+                    Task {
+                        await viewModel.connectAppleMusic()
+                    }
                 }
             }
             
