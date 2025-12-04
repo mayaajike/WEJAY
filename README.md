@@ -1,3 +1,4 @@
+# WEJAY
 # A7 Progress Review
 
 ## Feature integrations
@@ -24,8 +25,6 @@
 - Share flow, QR join, and role-based DJ/guest routing are stubbed in the UI but not yet implemented.
 
 
-
-# WEJAY
 I will be creating an iOS mobile app called We-Jay that will help DJs and music fans connect at events. Music is a big part of any gathering, and while everyone wants to hear their favorite songs, DJs often have a hard time keeping the crowd interested, receiving and managing requests.
 
 For example, think about this situation: A group of Italian college graduates has their last dinner in France. The place, food, and service are all great, but the French DJ only plays French music. The Italian guests have a hard time enjoying the night because they can't understand the language and there isn't any music they can relate to. The end result is a celebration that is less meaningful and less memorable.
