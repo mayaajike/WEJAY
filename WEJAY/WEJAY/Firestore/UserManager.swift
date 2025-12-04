@@ -9,8 +9,8 @@ import Foundation
 import FirebaseFirestore
 
 struct UserName: Codable {
-    let first: String?
-    let last: String?
+    var first: String?
+    var last: String?
 }
 
 enum UserRole: String, Codable {
@@ -38,7 +38,6 @@ struct AppleMusicInfo: Codable {
 struct DBUser: Codable {
     let userId: String
     let email: String?
-    let username: UserName?
     let photoUrl: URL?
     let dateCreated: Date?
     let isPremium: Bool?
@@ -47,10 +46,19 @@ struct DBUser: Codable {
     let spotify: SpotifyInfo?
     let appleMusic: AppleMusicInfo?
     
+    var username: UserName?
+    
+    var firstName: String? {
+        username?.first
+    }
+    
+    var lastName: String? {
+        username?.last
+    }
+    
     init(auth: AuthDataResultModel) {
         self.userId = auth.uid
         self.email = auth.email
-        self.username = nil
         self.photoUrl = auth.photoUrl
         self.dateCreated = Date()
         self.isPremium = false
@@ -58,6 +66,12 @@ struct DBUser: Codable {
         self.role = nil
         self.spotify = nil
         self.appleMusic = nil
+        
+        if auth.firstName != nil || auth.lastName != nil {
+            self.username = UserName(first: auth.firstName, last: auth.lastName)
+        } else {
+            self.username = nil
+        }
     }
     
     init(
