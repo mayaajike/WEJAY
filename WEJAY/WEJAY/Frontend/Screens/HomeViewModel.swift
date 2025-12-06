@@ -18,6 +18,7 @@ final class HomeViewModel: ObservableObject {
     @Published var spotifyUser: SpotifyUserProfile? = nil
     @Published var spotifyInfo: SpotifyInfo? = nil
     @Published var appleMusicInfo: AppleMusicInfo? = nil
+    @Published var activeParties: [Party] = []
     
     var isSpotifyConnected: Bool {
         spotifyInfo?.isConnected == true
@@ -49,6 +50,12 @@ final class HomeViewModel: ObservableObject {
             
             let dbUser = try await UserManager.shared.getUser(userId: authUser.uid)
             self.dbUser = dbUser
+            
+            // If this is a DJ, also load their active parties
+            if dbUser.role == .dj {
+                await refreshActiveParties()
+            }
+            
             self.spotifyInfo = dbUser.spotify
             self.appleMusicInfo = dbUser.appleMusic
             
@@ -180,6 +187,18 @@ final class HomeViewModel: ObservableObject {
             print("Apple Music connected: ", info)
         } catch {
             print("Apple Music connection failed: ", error)
+        }
+    }
+    
+    // MARK: DJHOMESCREEN functions
+    func refreshActiveParties() async {
+        guard let user = dbUser, user.role == .dj else { return }
+        
+        do {
+            let parties = try await PartyManager.shared.getActiveParties(forDJ: user.userId)
+            self.activeParties = parties
+        } catch {
+            print("Error loading active parties:", error)
         }
     }
     
