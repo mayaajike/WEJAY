@@ -45,6 +45,7 @@ struct DBUser: Codable {
     let role: UserRole?
     let spotify: SpotifyInfo?
     let appleMusic: AppleMusicInfo?
+    let profilePictureUrl: String?
     
     var username: UserName?
     
@@ -66,6 +67,7 @@ struct DBUser: Codable {
         self.role = nil
         self.spotify = nil
         self.appleMusic = nil
+        self.profilePictureUrl = nil
         
         if auth.firstName != nil || auth.lastName != nil {
             self.username = UserName(first: auth.firstName, last: auth.lastName)
@@ -84,7 +86,8 @@ struct DBUser: Codable {
         genres: [String]? = nil,
         role: UserRole? = nil,
         spotify: SpotifyInfo? = nil,
-        appleMusic: AppleMusicInfo? = nil
+        appleMusic: AppleMusicInfo? = nil,
+        profilePictureUrl: String? = nil
     ) {
         self.userId = userId
         self.email = email
@@ -96,6 +99,7 @@ struct DBUser: Codable {
         self.role = role
         self.spotify = spotify
         self.appleMusic = appleMusic
+        self.profilePictureUrl = profilePictureUrl
     }
 }
 
@@ -126,38 +130,10 @@ final class UserManager {
         try userDocument(userId: user.userId).setData(from: user, merge: false, encoder: encoder)
     }
     
-//    func createNewUser(auth: AuthDataResultModel) async throws {
-//        var userData: [String:Any] = [
-//            "user_id": auth.uid,
-//            "date_created": Timestamp(),
-//        ]
-//        if let email = auth.email {
-//            userData["email"] = email
-//        }
-//        if let photoUrl = auth.photoUrl {
-//            userData["photo_url"] = photoUrl
-//        }
-//        try await userDocument(userId: auth.uid).setData(userData, merge: false)
-//    }
-    
     func getUser(userId: String) async throws -> DBUser {
         try await userDocument(userId: userId).getDocument(as: DBUser.self, decoder: decoder)
     }
-    
-//    func getUser(userId: String) async throws -> DBUser {
-//        let snapshot = try await userDocument(userId: userId).getDocument()
-//        
-//        guard let data = snapshot.data(), let userId = data["user_id"] as? String else {
-//            throw URLError(.badServerResponse)
-//        }
-//        
-//        let email = data["email"] as? String
-//        let photoUrl = data["photo_url"] as? URL
-//        let dateCreated = data["date_created"] as? Date
-//        
-//        return DBUser(userId: userId, email: email, photoUrl: photoUrl, dateCreated: dateCreated)
-//    }
-    
+        
     func updateUserPremiumStatus(userId: String, isPremium: Bool) async throws {
         let data: [String:Any] = [
             "is_premium": isPremium
@@ -218,5 +194,13 @@ final class UserManager {
         ]
         
         try await userDocument(userId: userId).updateData(dict)
+    }
+    
+    func updateUserProfileImage(userId: String, url: String) async throws {
+        let data: [String: Any] = [
+            "profile_picture_url": url
+        ]
+        
+        try await userDocument(userId: userId).updateData(data)
     }
 }

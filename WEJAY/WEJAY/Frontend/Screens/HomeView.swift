@@ -54,12 +54,15 @@ struct HomeView: View {
         
     private var header: some View {
         HStack(spacing: 16) {
-            // profile image
+            // MARK: Profile Image (Fixed NaN Crash)
             ZStack {
                 if let user = viewModel.dbUser,
-                   let url = user.photoUrl {
-                    ImageLoaderView(urlString: url.absoluteString)
-                        .background(.appWhite)
+                   let url = user.profilePictureUrl {
+                    
+                    // FIX: Applied explicit frame DIRECTLY to the loader
+                    ImageLoaderView(urlString: url)
+                        .frame(width: 35, height: 35)
+                        .background(Color.appWhite)
                         .clipShape(Circle())
                         .onTapGesture {
                             router.showScreen(.push) { _ in
@@ -67,11 +70,12 @@ struct HomeView: View {
                             }
                         }
                 } else {
-                    // fallback avatar if no photoUrl
+                    // Fallback avatar
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .scaledToFit()
-                        .foregroundStyle(.appWhite)
+                        .frame(width: 35, height: 35) // Explicit frame here too
+                        .foregroundStyle(Color.appWhite)
                         .onTapGesture {
                             router.showScreen(.push) { _ in
                                 ProfileView(showSignUpView: $showSignUpView)
@@ -79,6 +83,7 @@ struct HomeView: View {
                         }
                 }
             }
+            // Keep this frame on the container as a safety net
             .frame(width: 35, height: 35)
             
             
@@ -107,7 +112,7 @@ struct HomeView: View {
             } label : {
                 Image(systemName: "gearshape")
                     .font(.callout)
-                    .foregroundStyle(.appWhite)
+                    .foregroundStyle(Color.appWhite)
                     .frame(minWidth: 40, minHeight: 35)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 10)
@@ -129,12 +134,11 @@ struct HomeView: View {
             HStack(spacing: 12) {
                 GuideBarCell(option: .spotify, titleOverride: viewModel.spotifyButtonDisplayTitleOverride) {
                     Task {
-                        
                         guard !viewModel.isSpotifyConnected else { return }
                         await viewModel.connectSpotify()
                     }
                 }
-                
+              
                 GuideBarCell(option: .appleMusic, titleOverride: viewModel.appleMusicButtonDisplayTitleOverride) {
                     // TODO: Join developer program and test auth flow
                     Task {
@@ -142,7 +146,7 @@ struct HomeView: View {
                     }
                 }
             }
-            
+           
             // Bottom row share button
             GuideBarCell(option: .share, titleOverride: nil) {
                 // TODO: share party flow
@@ -167,7 +171,7 @@ struct HomeView: View {
             title: product.title,
             subtitle: product.description,
             onAddToPlaylistPressed: {
-                
+              
             },
             onPlayPressed: {
                 goToPlaylistView(product: product)
@@ -181,10 +185,10 @@ struct HomeView: View {
                 Text(row.title)
                     .font(.title)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.appWhite)
+                    .foregroundStyle(Color.appWhite)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
-                
+              
                 ScrollView(.horizontal) {
                     HStack(alignment: .top, spacing: 16) {
                         ForEach(row.products) { product in
