@@ -42,12 +42,10 @@ struct LogInEmailView: View {
                     Button {
                         // Authenticate the user
                         Task {
-                            do {
-                                try await viewModel.LogIn()
+                            await viewModel.LogIn()
+                            
+                            if viewModel.formErrorMessage == nil {
                                 showSignUpView = false
-                                return
-                            } catch {
-                                print(error)
                             }
                         }
                     } label: {
@@ -59,12 +57,26 @@ struct LogInEmailView: View {
                             .cornerRadius(10)
                     }
                     
+                    if let error = viewModel.formErrorMessage {
+                        Text(error)
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.red)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 300)
+                            .padding(.top, 4)
+                    }
+                    
+                    Spacer()
+                        .frame(height: 16)
+                    
                     NavigationLink(destination: SignUpEmailView(showSignUpView: $showSignUpView)) {
                         Text("Don't have an account yet? Sign Up")
                             .font(.body)
                             .foregroundColor(.purple)
                             .underline(color: .purple)
                     }
+                    .padding(.top , 4)
                 }
             }
             .navigationTitle("Log In With Email")

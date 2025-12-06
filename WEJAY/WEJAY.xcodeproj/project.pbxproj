@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0406A5EE2EE233B4002D51BC /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 0406A5ED2EE233B4002D51BC /* FirebaseStorage */; };
 		044249A12ED5A08C0076A75E /* SwiftfulUI in Frameworks */ = {isa = PBXBuildFile; productRef = 044249A02ED5A08C0076A75E /* SwiftfulUI */; };
 		044249A42ED5A0B50076A75E /* SwiftfulRouting in Frameworks */ = {isa = PBXBuildFile; productRef = 044249A32ED5A0B50076A75E /* SwiftfulRouting */; };
 		04B4986C2ECF854E00256821 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 04B4986B2ECF854E00256821 /* FirebaseAnalytics */; };
@@ -80,6 +81,7 @@
 				04B498772ECF85CC00256821 /* SDWebImageSwiftUI in Frameworks */,
 				04B4987A2ECF87C000256821 /* FirebaseAuth in Frameworks */,
 				04B4986F2ECF857B00256821 /* SwiftUIFontIcon in Frameworks */,
+				0406A5EE2EE233B4002D51BC /* FirebaseStorage in Frameworks */,
 				04B4986C2ECF854E00256821 /* FirebaseAnalytics in Frameworks */,
 				044249A42ED5A0B50076A75E /* SwiftfulRouting in Frameworks */,
 				044249A12ED5A08C0076A75E /* SwiftfulUI in Frameworks */,
@@ -163,6 +165,7 @@
 				04B498992ECFB74500256821 /* FirebaseFirestore */,
 				044249A02ED5A08C0076A75E /* SwiftfulUI */,
 				044249A32ED5A0B50076A75E /* SwiftfulRouting */,
+				0406A5ED2EE233B4002D51BC /* FirebaseStorage */,
 			);
 			productName = WEJAY;
 			productReference = 04B498392ECF815800256821 /* WEJAY.app */;
@@ -664,6 +667,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0406A5ED2EE233B4002D51BC /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B4986A2ECF854E00256821 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		044249A02ED5A08C0076A75E /* SwiftfulUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0442499F2ED5A08C0076A75E /* XCRemoteSwiftPackageReference "SwiftfulUI" */;
