@@ -185,3 +185,109 @@ extension SpotifyAPIService {
         return profile
     }
 }
+
+// MARK: - Playlist DTOs
+
+struct SpotifyPlaylistResponse: Decodable {
+    let id: String
+    let uri: String
+    let name: String
+    let external_urls: ExternalUrls?
+    
+    struct ExternalUrls: Decodable {
+        let spotify: String?
+    }
+}
+
+extension SpotifyAPIService {
+    
+    /// Creates a playlist in the DJ's Spotify account.
+    func createPlaylist(
+        accessToken: String,
+        userId: String,
+        name: String,
+        description: String?,
+        isPublic: Bool = false
+    ) async throws -> SpotifyPlaylistResponse {
+        
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = SpotifyAPIConstants.apiHost
+        components.path = "/v1/users/\(userId)/playlists"
+        
+        guard let url = components.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        struct Body: Encodable {
+            let name: String
+            let description: String?
+            let `public`: Bool
+        }
+        
+        let body = Body(
+            name: name,
+            description: description,
+            public: isPublic
+        )
+        
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let http = response as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            let raw = String(data: data, encoding: .utf8) ?? "No body"
+            print("Spotify create playlist error:", raw)
+            throw NetworkError.invalidServerResponse
+        }
+        
+        let playlist = try JSONDecoder().decode(SpotifyPlaylistResponse.self, from: data)
+        return playlist
+    }
+    
+    /// Adds tracks to an existing Spotify playlist (up to 100 URIs per call).
+    func addTracksToPlaylist(
+        accessToken: String,
+        playlistId: String,
+        uris: [String]
+    ) async throws {
+        
+        guard !uris.isEmpty else { return }
+        
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = SpotifyAPIConstants.apiHost
+        components.path = "/v1/playlists/\(playlistId)/tracks"
+        
+        guard let url = components.url else {
+            throw NetworkError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        struct Body: Encodable {
+            let uris: [String]
+        }
+        
+        let body = Body(uris: uris)
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let http = response as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            let raw = String(data: data, encoding: .utf8) ?? "No body"
+            print("Spotify add tracks error:", raw)
+            throw NetworkError.invalidServerResponse
+        }
+    }
+}

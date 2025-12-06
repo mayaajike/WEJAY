@@ -103,6 +103,21 @@ struct DBUser: Codable {
     }
 }
 
+extension DBUser {
+    var hasFullName: Bool {
+        guard let username else { return false }
+        
+        let first = (username.first ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let last = (username.last ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        return !first.isEmpty && !last.isEmpty
+    }
+    
+    var isProfileComplete: Bool {
+        hasFullName && role != nil
+    }
+}
+
 final class UserManager {
     
     static let shared = UserManager()

@@ -1,5 +1,5 @@
 //
-//  HomeView.swift
+//  GuestHomeView.swift
 //  WEJAY
 //
 //  Created by Maya Ody-Ajike on 11/25/25.
@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftfulUI
 import SwiftfulRouting
 
-struct HomeView: View {
+struct GuestHomeView: View {
     
     @Binding var showSignUpView: Bool
     @Environment(\.router) var router
@@ -54,12 +54,12 @@ struct HomeView: View {
         
     private var header: some View {
         HStack(spacing: 16) {
-            // MARK: Profile Image (Fixed NaN Crash)
+            // MARK: Profile Image
             ZStack {
                 if let user = viewModel.dbUser,
                    let url = user.profilePictureUrl {
                     
-                    // FIX: Applied explicit frame DIRECTLY to the loader
+
                     ImageLoaderView(urlString: url)
                         .frame(width: 35, height: 35)
                         .background(Color.appWhite)
@@ -70,11 +70,10 @@ struct HomeView: View {
                             }
                         }
                 } else {
-                    // Fallback avatar
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 35, height: 35) // Explicit frame here too
+                        .frame(width: 35, height: 35)
                         .foregroundStyle(Color.appWhite)
                         .onTapGesture {
                             router.showScreen(.push) { _ in
@@ -83,7 +82,6 @@ struct HomeView: View {
                         }
                 }
             }
-            // Keep this frame on the container as a safety net
             .frame(width: 35, height: 35)
             
             
@@ -213,7 +211,7 @@ struct HomeView: View {
 #Preview {
     NavigationStack {
         RouterView { _ in
-            HomeView(showSignUpView: .constant(false))
+            GuestHomeView(showSignUpView: .constant(false))
         }
     }
 }

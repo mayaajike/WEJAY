@@ -373,10 +373,18 @@ private extension ProfileView {
     var continueButton: some View {
         VStack(spacing: 12) {
             Button {
-                // Ensure the view isn't reloading during navigation
-                if viewModel.isProfileComplete {
+                guard viewModel.isProfileComplete,
+                      let role = viewModel.role else { return }
+                
+                switch role {
+                case .dj:
                     router.showScreen(.fullScreenCover) { _ in
-                        HomeView(showSignUpView: $showSignUpView)
+                        DJHomeView(showSignUpView: $showSignUpView)
+                    }
+                    
+                case .guest:
+                    router.showScreen(.fullScreenCover) { _ in
+                        GuestHomeView(showSignUpView: $showSignUpView)
                     }
                 }
             } label: {

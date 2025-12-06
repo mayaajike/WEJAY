@@ -24,9 +24,9 @@ final class StorageManager {
         imagesReference.child(userId)
     }
     
-//    func getData(userId: String, url: String) async throws -> Data {
-//        try await storage.child(url).data(maxSize: 3 * 1024 * 1024)
-//    }
+    private func partyReference(partyId: String) -> StorageReference {
+        imagesReference.child("parties").child(partyId)
+    }
     
     func getData(from urlString: String) async throws -> Data {
         guard let url = URL(string: urlString) else {
@@ -49,11 +49,6 @@ final class StorageManager {
         let url = try await ref.downloadURL()
         return url.absoluteString
         
-//        guard let returnedPath = returnedMetaData.path, let returnedName = returnedMetaData.name else {
-//            throw URLError(.badServerResponse)
-//        }
-//        
-//        return (returnedPath, returnedName)
     }
     
     func saveImage(image: UIImage, userId: String) async throws -> String {
@@ -62,5 +57,28 @@ final class StorageManager {
         }
         
         return try await saveImage(data: data, userId: userId)
+    }
+    
+    // MARK: Party Images
+    
+    func savePartyImage(data: Data, partyId: String) async throws -> String {
+        let meta = StorageMetadata()
+        meta.contentType = "image/jpeg"
+        
+        let path = "cover_photo.jpeg"
+        let ref = partyReference(partyId: partyId).child(path)
+        
+        _ = try await ref.putDataAsync(data, metadata: meta)
+        
+        let url = try await ref.downloadURL()
+        return url.absoluteString
+    }
+    
+    func savePartyImage(image: UIImage, partyId: String) async throws -> String {
+        guard let data = image.jpegData(compressionQuality: 1) else {
+            throw URLError(.backgroundSessionWasDisconnected)
+        }
+        
+        return try await savePartyImage(data: data, partyId: partyId)
     }
 }
